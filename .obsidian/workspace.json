@@ -110,7 +110,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "raw/chatgpt-exports/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +119,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for README"
+              "title": "Backlinks"
             }
           },
           {
@@ -129,12 +128,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "raw/chatgpt-exports/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from README"
+              "title": "Outgoing links"
             }
           },
           {
@@ -172,13 +170,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "raw/chatgpt-exports/README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of README"
+              "title": "Outline"
             }
           }
         ]
@@ -199,8 +196,34 @@
       "bases:Create new base": false
     }
   },
-  "active": "a68092a22935de23",
+  "active": "d9d8a7cbe3ff1593",
   "lastOpenFiles": [
+    "raw/nusmods/MA1301.md",
+    "raw/nusmods/ES2660.md",
+    "raw/nusmods/IS2218.md",
+    "raw/nusmods/UTC2734.md",
+    "raw/nusmods/CS2100.md",
+    "raw/nusmods/CS2101.md",
+    "raw/nusmods/CS2103T.md",
+    "raw/nusmods/ETP3205.md",
+    "raw/nusmods/CFG1004.md",
+    "raw/nusmods/IS1108.md",
+    "raw/nusmods/ST2334.md",
+    "raw/nusmods/UTC1702C.md",
+    "raw/nusmods/MA1522.md",
+    "raw/nusmods/CS2030S.md",
+    "raw/nusmods/CS2040S.md",
+    "raw/nusmods/ST1131.md",
+    "raw/nusmods/UTW1001A.md",
+    "raw/nusmods/MA1521.md",
+    "raw/nusmods/CS1231S.md",
+    "raw/nusmods/CS1101S.md",
+    "__pycache__/fetch_modules.cpython-314.pyc",
+    "raw/nusmods/README.md",
+    "raw/nusmods",
+    "fetch_modules.py",
+    "my-modules.md",
+    "raw/chatgpt-exports/README.md",
     "providers.json",
     "__pycache__/probe_providers.cpython-314.pyc",
     "probe_providers.py",
@@ -208,35 +231,9 @@
     "wiki/source-summaries/backend-learnings-source-summary.md",
     "wiki/source-summaries/aws-learnings-source-summary.md",
     "wiki/source-summaries",
-    "wiki/concepts/mvcc-multi-version-concurrency-control.md",
-    "wiki/concepts/database-processing-and-query-layers.md",
-    "wiki/concepts/aws-components-from-notes.md",
-    "wiki/concepts/microservices-and-load-balancing-context.md",
-    "wiki/concepts/authentication-with-jwt-and-refresh-tokens.md",
-    "wiki/concepts/event-broker-vs-message-broker.md",
-    "wiki/concepts/cache-aside-and-cache-strategies.md",
-    "wiki/concepts/http-request-lifecycle-and-components.md",
     "__pycache__/brain_ui.cpython-314.pyc",
     "__pycache__",
-    "raw/notion-exports/internship-learning-log.md",
-    "raw/notion-exports/tech-stack-learnings.md",
-    "raw/notion-exports/database-learnings.md",
-    "raw/notion-exports/aws-learnings.md",
-    "raw/notion-exports/backend-learnings.md",
-    "wiki/meta/voice-profile.md",
     "wiki/meta",
-    "raw/notes/Backend learnings 37bef141e357809cb9b8db0f9b916bf3.md",
-    "raw/claude-exports/Backend learnings 37bef141e357809cb9b8db0f9b916bf3.md",
-    "brain_ui.py.tmp.3325.9723e6e3645e",
-    "env/bin/markitdown",
-    "env/lib/python3.14/site-packages/markitdown-0.0.2.dist-info/licenses/LICENSE",
-    "env/lib/python3.14/site-packages/markitdown-0.0.2.dist-info/licenses",
-    "env/lib/python3.14/site-packages/ddgs-9.14.4.dist-info/licenses/LICENSE.md",
-    "env/lib/python3.14/site-packages/openai/resources/webhooks/api.md",
-    "env/lib/python3.14/site-packages/openai/resources/responses/api.md",
-    "env/lib/python3.14/site-packages/openai/resources/realtime/api.md",
-    "env/lib/python3.14/site-packages/openai/resources/conversations/api.md",
-    "env/lib/python3.14/site-packages/flask/sansio/README.md",
     "env/lib/python3.14/site-packages/werkzeug/debug/shared/more.png",
     "env/lib/python3.14/site-packages/werkzeug/debug/shared/less.png",
     "env/lib/python3.14/site-packages/werkzeug/debug/shared/console.png",

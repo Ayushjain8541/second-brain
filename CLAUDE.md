@@ -22,6 +22,7 @@ This vault has two ownership zones:
 | `fathom/` | Meeting transcripts and summaries from Fathom |
 | `youtube-transcripts/` | Transcripts from YouTube videos |
 | `pdfs/` | Books, papers, reports |
+| `nusmods/` | Official NUS module info, auto-fetched from NUSMods by `fetch_modules.py`. Not hand-filled. |
 
 ### wiki/ structure
 
@@ -42,6 +43,14 @@ This vault has two ownership zones:
 - `/ingest` reads the profile before writing any prose and follows it as the style guide.
 
 The profile separates the user's raw quick-message habits (lowercase "i", dropped apostrophes) from how pages should render in public (keep the voice and rhythm, clean up the shorthand).
+
+### NUS modules
+
+The user is an NUS student, and module learnings should flow into the wiki automatically. The flow has two deterministic stages plus synthesis:
+
+1. The user maintains `my-modules.md` at the vault root (one module code per line, outside `raw/` so `/ingest` skips it).
+2. `fetch_modules.py` reads that list and pulls each module's official info from the NUSMods API into `raw/nusmods/<CODE>.md`.
+3. `/module` turns each into a `project`-type hub page in `wiki/projects/`: the official NUSMods scaffold (neutral, attributed) plus a "What I Learned" section that links out to the atomic concept pages `/ingest` builds from the user's notes. It does not duplicate concept content; shared concepts stay single pages.
 
 ---
 

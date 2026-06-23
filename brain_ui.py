@@ -211,6 +211,43 @@ If the note mentions something that does not yet have a wiki page, do not create
 - Note: ... (stub opportunity: [[new-topic]])
 ```"""
     },
+    "module": {
+        "description": "Build wiki project pages for my NUS modules.",
+        "hint": "optional module code (e.g. CS2103T)",
+        "prompt": """---
+description: Build wiki project pages for my NUS modules.
+argument-hint: (optional) a specific module code, e.g. CS2103T
+---
+
+You are building or updating wiki pages for the user's NUS modules. Each module page is a `project`-type hub: it pairs the official NUSMods scaffold with links to the user's own learnings. Follow CLAUDE.md exactly.
+
+**Step 1 — Find the module data**
+Look in `raw/nusmods/` for module files (e.g. `raw/nusmods/CS2103T.md`), the official NUSMods exports written by fetch_modules.py. If $ARGUMENTS names a specific module code, only process that one. Otherwise process every module file in `raw/nusmods/`.
+
+If `raw/nusmods/` is empty, stop and tell the user to add codes to `my-modules.md` and run `./env/bin/python fetch_modules.py` first. Do not invent module data.
+
+**Step 2 — For each module, build the hub page**
+Write to `wiki/projects/<code>-<slug>.md` with frontmatter (title, type: project, sources include the raw/nusmods file, related, created, last-updated) and these sections:
+- `## Summary` — one or two lines on what the module is, in the user's voice.
+- `## Official Overview` — the factual scaffold from NUSMods (aims, topics, workload, prerequisites). Neutral and attributed to NUSMods. Do not restyle it as the user's words.
+- `## What I Learned` — a hub, not a dump. Link to the atomic concept pages from the user's notes, each with a one-line note on how it connects to this module. If there are no learnings on file yet, say so and leave a stub.
+- `## Open Questions` — gaps and things that confused the user.
+- `## Sources` — prose attribution: the NUSMods file plus any notes that fed the learnings.
+
+**Step 3 — Link, don't duplicate**
+To fill "What I Learned", scan `wiki/concepts/` and `wiki/source-summaries/` for pages whose topics match this module's syllabus, and link them with `[[page-name]]`. Never copy concept content into the module page. If a relevant concept should exist but doesn't, note it as a stub opportunity in Open Questions.
+
+**Step 4 — Voice**
+Read `wiki/meta/voice-profile.md` first. Summary, What I Learned, and Open Questions are the user's own words, so follow the profile (first person, no em dashes, light on bold). The Official Overview is NUSMods' words, so keep it factual and attributed.
+
+**Step 5 — Update catalog and log**
+Add each new page to the Projects section of `wiki/index.md`, and append a timestamped entry to `wiki/log.md`.
+
+**Constraints**
+- Never modify anything in `raw/`.
+- Every page needs complete frontmatter (type: project).
+- Attribute official content to NUSMods; attribute learnings to the user's notes."""
+    },
     "voice": {
         "description": "Refine the voice profile from my own writing.",
         "hint": "optional file count (e.g. 10)",
@@ -283,7 +320,7 @@ VAULT_ROOT = os.path.abspath(".")
 # Recognised raw/ subfolders, used to populate the upload destination picker.
 RAW_SUBFOLDERS = [
     "claude-exports", "chatgpt-exports", "gemini-exports", "notion-exports",
-    "notes", "articles", "fathom", "youtube-transcripts", "pdfs",
+    "notes", "articles", "fathom", "youtube-transcripts", "pdfs", "nusmods",
 ]
 
 def safe_vault_path(path):
@@ -756,7 +793,7 @@ HTML_UI = """<!DOCTYPE html>
             <!-- Bottom utility settings -->
             <div class="p-4 border-t border-slate-800 bg-slate-900/80 space-y-2">
                 <button onclick="openNewFileModal()" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white rounded-lg py-2 text-xs font-semibold shadow-md transition-all">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Create New File
+                    <i data-lucide="clipboard-paste" class="w-4 h-4"></i> Paste a Note
                 </button>
             </div>
         </aside>
@@ -810,6 +847,13 @@ HTML_UI = """<!DOCTYPE html>
                                 <span class="bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-mono">/voice</span>
                             </span>
                             <span class="text-[10px] text-slate-400 line-clamp-2">Refine the voice profile from your own writing.</span>
+                        </button>
+
+                        <button onclick="selectCommand('module', 'Build wiki project pages for my NUS modules')" class="cmd-btn border border-slate-800 bg-slate-900/50 hover:bg-indigo-950/20 hover:border-indigo-500/50 p-3 rounded-lg text-left transition-all flex flex-col gap-1 focus:outline-none" id="btn-module">
+                            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1">
+                                <span class="bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-mono">/module</span>
+                            </span>
+                            <span class="text-[10px] text-slate-400 line-clamp-2">Build NUS module pages from raw/nusmods + your notes.</span>
                         </button>
                     </div>
 
@@ -905,34 +949,39 @@ HTML_UI = """<!DOCTYPE html>
 
     <!-- Modal dialogue for file creation -->
     <div id="new-file-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-indigo-900/50 rounded-lg text-indigo-400">
-                    <i data-lucide="file-plus" class="w-6 h-6"></i>
+                    <i data-lucide="clipboard-paste" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-slate-100 text-sm">Create New Vault File</h3>
-                    <p class="text-xs text-slate-400">Input file location relative to folder root.</p>
-                </div>
-            </div>
-            
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">Target Folder Path</label>
-                    <select id="new-file-folder" class="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500">
-                        <option value="wiki/">wiki/</option>
-                        <option value="raw/">raw/</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-slate-400 font-medium mb-1">File Name (include extension)</label>
-                    <input type="text" id="new-file-name" placeholder="example_note.md" class="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500">
+                    <h3 class="font-bold text-slate-100 text-sm">Paste a New Note</h3>
+                    <p class="text-xs text-slate-400">Pick a folder, name it, paste your text. Saved as a markdown file.</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-2 text-xs pt-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Destination folder</label>
+                    <select id="new-file-folder" class="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500">
+                        <!-- options injected from /api/vault -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">File name</label>
+                    <input type="text" id="new-file-name" placeholder="my-note (.md added if omitted)" class="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <div class="text-xs">
+                <label class="block text-slate-400 font-medium mb-1">Content</label>
+                <textarea id="new-file-content" rows="12" placeholder="Paste your markdown or notes here..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 font-mono text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 resize-y custom-scroll"></textarea>
+                <p class="text-[10px] text-slate-500 mt-1" id="new-file-preview">Will save to raw/notes/</p>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 text-xs pt-1">
                 <button onclick="closeNewFileModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg">Cancel</button>
-                <button onclick="submitNewFile()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow">Create</button>
+                <button onclick="submitNewFile()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow flex items-center gap-1.5"><i data-lucide="save" class="w-3.5 h-3.5"></i> Save Note</button>
             </div>
         </div>
     </div>
@@ -946,6 +995,8 @@ HTML_UI = """<!DOCTYPE html>
         let openEditingPath = "";
         // Remembers which folders are collapsed so the tree keeps its state across refreshes
         const collapsedFolders = new Set();
+        // raw/ subfolders, refreshed from the API, used to fill the paste-note destination picker
+        let rawSubfolders = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
@@ -1068,6 +1119,9 @@ HTML_UI = """<!DOCTYPE html>
             } else if (cmd === 'voice') {
                 argInput.placeholder = "Optional: max number of files to learn from (e.g. 10). Leave blank to sample broadly.";
                 hintDisplay.innerText = "optional file count";
+            } else if (cmd === 'module') {
+                argInput.placeholder = "Optional: a single module code (e.g. CS2103T). Leave blank to build all fetched modules.";
+                hintDisplay.innerText = "optional module code";
             }
 
             document.getElementById("execute-btn").disabled = false;
@@ -1148,6 +1202,9 @@ HTML_UI = """<!DOCTYPE html>
 
                 document.getElementById("raw-count").innerText = data.raw.length;
                 document.getElementById("wiki-count").innerText = data.wiki.length;
+
+                // Remember raw subfolders for the paste-note modal
+                rawSubfolders = data.raw_subfolders || [];
 
                 // Populate upload destination picker (preserve current selection)
                 const folderSelect = document.getElementById("upload-folder");
@@ -1292,19 +1349,59 @@ HTML_UI = """<!DOCTYPE html>
 
         // Utility Modal Handlers
         function openNewFileModal() {
+            // Build the destination dropdown: every raw/ subfolder, then wiki areas
+            const sel = document.getElementById("new-file-folder");
+            const rawOpts = (rawSubfolders.length ? rawSubfolders : ["notes"]).map(f => `raw/${f}/`);
+            const wikiOpts = ["wiki/concepts/", "wiki/projects/", "wiki/people/", "wiki/source-summaries/"];
+            const all = [...rawOpts, ...wikiOpts];
+            sel.innerHTML = "";
+            all.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p;
+                opt.innerText = p;
+                sel.appendChild(opt);
+            });
+            sel.value = all.includes("raw/notes/") ? "raw/notes/" : all[0];
+
+            sel.onchange = updateNewFilePreview;
+            document.getElementById("new-file-name").oninput = updateNewFilePreview;
+            updateNewFilePreview();
+
             document.getElementById("new-file-modal").classList.remove("hidden");
+            document.getElementById("new-file-name").focus();
         }
 
         function closeNewFileModal() {
             document.getElementById("new-file-modal").classList.add("hidden");
             document.getElementById("new-file-name").value = "";
+            document.getElementById("new-file-content").value = "";
+        }
+
+        // Normalise a filename: trim, default, and ensure a .md extension
+        function normalisedFileName() {
+            let name = document.getElementById("new-file-name").value.trim();
+            if (!name) return "";
+            if (!/\\.[a-z0-9]+$/i.test(name)) name += ".md";
+            return name;
+        }
+
+        function updateNewFilePreview() {
+            const folder = document.getElementById("new-file-folder").value;
+            const name = normalisedFileName();
+            document.getElementById("new-file-preview").innerText =
+                name ? `Will save to ${folder}${name}` : `Will save to ${folder}`;
         }
 
         async function submitNewFile() {
             const folder = document.getElementById("new-file-folder").value;
-            const name = document.getElementById("new-file-name").value.trim();
+            const name = normalisedFileName();
+            const content = document.getElementById("new-file-content").value;
             if (!name) {
-                showToast("File name cannot be blank", "error");
+                showToast("Give the file a name", "error");
+                return;
+            }
+            if (!content.trim()) {
+                showToast("Paste some content first", "error");
                 return;
             }
 
@@ -1313,22 +1410,20 @@ HTML_UI = """<!DOCTYPE html>
                 const res = await fetch('/api/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        path: targetPath,
-                        content: `# ${name.split('.')[0]}\nStart drafting your vault records here...`
-                    })
+                    body: JSON.stringify({ path: targetPath, content: content })
                 });
 
                 if (res.ok) {
-                    showToast(`Created ${targetPath}`, "success");
+                    showToast(`Saved ${targetPath}`, "success");
                     closeNewFileModal();
                     refreshVault();
                     openFile(targetPath);
                 } else {
-                    showToast("Error creating file.", "error");
+                    const data = await res.json().catch(() => ({}));
+                    showToast(data.error || "Error saving file.", "error");
                 }
             } catch (err) {
-                showToast("Server creation failure.", "error");
+                showToast("Server error while saving.", "error");
             }
         }
 

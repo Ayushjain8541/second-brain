@@ -1,1 +1,11 @@
 env/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Secrets (e.g. Neo4j Aura credentials)
+.env
+
+# macOS
+.DS_Store
