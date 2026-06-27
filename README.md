@@ -9,6 +9,28 @@ A structured knowledge vault with two clear ownership zones:
 
 ---
 
+## Local dashboard (`brain_ui.py`)
+
+A minimal web UI for the vault: browse `raw/`/`wiki/` as a folder tree, drag-and-drop or paste notes into `raw/`, edit files, and run the commands (`/ingest`, `/query`, `/lint`, `/log`, `/voice`, `/module`) through free, key-free gpt4free providers.
+
+```bash
+# Run (uses the project venv, which has g4f installed)
+./env/bin/python brain_ui.py
+# then open http://localhost:5080
+```
+
+```bash
+# Stop
+pkill -f brain_ui.py
+```
+
+Notes:
+- If you see "Port 5080 is already in use", a previous instance is still running. Stop it first: `pkill -f brain_ui.py` (or `lsof -nP -iTCP:5080 -sTCP:LISTEN` to find the PID, then `kill <PID>`).
+- On startup it may print "Refreshing provider list in the background" — that's the harmless 7-day re-probe of working gpt4free providers; the UI works immediately.
+- This dashboard is independent of gbrain. It writes to `raw/`/`wiki/` directly; gbrain reads the wiki. Both can run at the same time.
+
+---
+
 ## Knowledge graph (gbrain)
 
 The wiki is served to AI tools as a queryable knowledge graph via [gbrain](https://github.com/garrytan/gbrain), so an AI can see what you already know and build on it instead of cold-starting. Everything runs **locally and key-free** (gbrain on PGLite + Ollama for embeddings).
